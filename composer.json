@@ -80,7 +80,7 @@
         "horde/url": "dev-master",
         "horde/util": "dev-master",
         "horde/view": "dev-master",
-        "pear-pear.php.net/PEAR": "*",
+        "pear/pear": "*",
         "ext-session": "*"
     },
     "suggest": {
