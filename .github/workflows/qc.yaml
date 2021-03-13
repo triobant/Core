@@ -1,0 +1,27 @@
+on:
+  push:
+    branches:
+      - master
+      - FRAMEWORK_6_0
+  workflow_dispatch:
+    inputs:
+      repository:
+        description: 'Which repository to check'     
+        required: false
+        default: 'view'
+      branch: 
+        description: 'Which branch'
+        required: false
+        default: 'FRAMEWORK_6_0'
+
+
+jobs:
+  qc_job:
+    runs-on: ubuntu-latest
+    name: Run horde/components qc
+    steps:
+    - name: Run the qc component
+      id: hello
+      uses: maintaina/actions-components-container@v0.0.1
+      with:
+        repository: 'core'
