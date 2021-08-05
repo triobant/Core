@@ -1,4 +1,5 @@
 ---
+
 name: make release
 
 # manual workflow to make a new release for the default branch
@@ -43,7 +44,7 @@ jobs:
           do  
             msg=$(git log --format=%B -n 1 $commit | head -n 1)
             if [ $entries_amount -gt $max_entries ]; then break; fi
-            if [[ $msg == "Released $CI_PROJECT_NAME"* ]]; then break; fi
+            if [[ $msg == "Released"* ]]; then break; fi
             if [[ $msg == 'Development mode for'* ]]; then break; fi
             if [[ $msg == 'automatic generation of composer.json'* ]]; then continue; fi
             if [[ $msg == 'Merge branch'* ]]; then continue; fi

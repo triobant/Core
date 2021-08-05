@@ -1,4 +1,5 @@
 ---
+
 name: update composer.json
 
 # run whenever we push to the default branch and .horde.yml was changed
