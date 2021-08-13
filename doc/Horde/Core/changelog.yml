@@ -4,11 +4,12 @@
   state:
     release: stable
     api: stable
-  date: 2021-07-14
+  date: 2021-08-13
   license:
     identifier: LGPL-2.1
     uri: http://www.horde.org/licenses/lgpl21
   notes: |
+    [] [mpa] test
     [rla] Controller Framework Routes now work correctly for separate subdomain or for uncommon webdir layouts.
     [rla] Controller Framework now has limited capabilities for unauthenticated or API-authenticated calls.
     [rla] Adapt schema migrations to work in new H6 installation layout.
