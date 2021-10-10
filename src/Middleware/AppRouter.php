@@ -78,7 +78,7 @@ class AppRouter implements MiddlewareInterface
         $fileroot = $this->registry->get('fileroot', $app);
         $routeFile = $fileroot . '/config/routes.php';
         if (!file_exists($routeFile)) {
-            throw new \Exception("No Routes file found for App");
+            throw new \Exception("No Routes file found for App <$app>");
         }
 
         // TODO: Should this move to another middleware?

@@ -13,6 +13,7 @@ use Horde\Http\Server\Runner;
 use Horde\Http\Server\Middleware\Responder;
 use Horde\Http\StreamFactory;
 use Horde\Core\Middleware\HordeCore as HordeCoreMiddleware;
+use Horde\Core\Middleware\ErrorFilter as ErrorHandlerMiddleware;
 use Horde_Injector;
 use Horde_Injector_TopLevel;
 
@@ -36,8 +37,9 @@ class RampageBootstrap
         $request = $requestBuilder->withGlobalVariables()->build();
         $injector = new Horde_Injector_TopLevel;
         $middlewares = [
-            // TODO: Unconditionally setup the output compressor, it should act only upon an attribute
             // TODO: Unconditionally setup the error handler
+            new ErrorHandlerMiddleware($responseFactory),
+            // TODO: Unconditionally setup the output compressor, it should act only upon an attribute
             // Setup the horde init middleware. It will add more middleware to the stack
             new HordeCoreMiddleware(),
         ];

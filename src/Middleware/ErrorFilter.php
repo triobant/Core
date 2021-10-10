@@ -6,6 +6,7 @@ namespace Horde\Core\Middleware;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use \Horde_Registry;
 use \Horde_Application;
@@ -30,9 +31,28 @@ use \Horde_Application;
  */
 class ErrorFilter implements MiddlewareInterface
 {
+    private ResponseFactoryInterface $responseFactory;
+
+    public function __construct(
+        ResponseFactoryInterface $responseFactory
+    ) {
+        $this->responseFactory = $responseFactory;
+    }
+
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        // TODO:
-        return $handler->handle($request);
+        try {
+            return $handler->handle($request);
+        } catch (\Exception $e){
+            // TODO Logging
+            if ($request->getAttribute('HORDE_GLOBAL_ADMIN')) {
+                throw $e;
+            } else {
+                // TODO output actual error page
+                return $this->responseFactory
+                    ->createResponse()
+                    ->withStatus(501, 'Internal Server Error');
+            }
+        }
     }
 }

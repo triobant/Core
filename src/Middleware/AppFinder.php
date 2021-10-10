@@ -151,7 +151,8 @@ class AppFinder implements MiddlewareInterface
 
         // If we still found no app, give up
         if (empty($found)) {
-            throw new \Exception("No App found for this path");
+            $path = $request->getUri()->getPath();
+            throw new \Exception("No App found for path '$path'");
         }
 
         // Route mapper doesn't like / as prefix
