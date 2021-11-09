@@ -35,7 +35,7 @@
     ],
     "require": {
         "horde/horde-installer-plugin": "dev-FRAMEWORK_6_0 || *",
-        "php": "^7",
+        "php": "^7.4 || ^8",
         "horde/alarm": "^3 || dev-FRAMEWORK_6_0",
         "horde/auth": "^3 || dev-FRAMEWORK_6_0",
         "horde/autoloader": "^3 || dev-FRAMEWORK_6_0",
@@ -81,7 +81,7 @@
         "ext-session": "*"
     },
     "require-dev": {
-        "horde/test": "^3 || dev-FRAMEWORK_6_0"
+        "horde/test": "dev-FRAMEWORK_6_0 || dev-FRAMEWORK_6_0"
     },
     "suggest": {
         "pear/text_captcha": "*",
