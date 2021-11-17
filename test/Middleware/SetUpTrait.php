@@ -29,6 +29,7 @@ use Horde\Http\Server\RampageRequestHandler;
 use Horde_Session;
 use Horde_Registry;
 use Horde_Exception;
+use Horde_Auth_Base;
 
 trait SetUpTrait
 {
@@ -54,5 +55,7 @@ trait SetUpTrait
             [],
             $this->defaultPayloadHandler
         );
+
+        $this->authDriver = $this->createMock(Horde_Auth_Base::class);
     }
 }
