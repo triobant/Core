@@ -42,6 +42,9 @@ class AuthHordeSessionTest extends Testcase
         $guestUser = $this->recentlyHandledRequest->getAttribute('HORDE_GUEST');
         // assert that $authUser and $guestUser have the correct values
 
+        $this->assertEquals($username, $authUser);  
+        $this->assertNull($guestUser);              
+
         $this->assertEquals(200, $response->getStatusCode());
     }
 
@@ -57,6 +60,9 @@ class AuthHordeSessionTest extends Testcase
         $authUser = $this->recentlyHandledRequest->getAttribute('HORDE_AUTHENTICATED_USER');
         $guestUser = $this->recentlyHandledRequest->getAttribute('HORDE_GUEST');
         // assert that $authUser and $guestUser have the correct values
+
+        $this->assertTrue($guestUser);  
+        $this->assertNull($authUser);   
 
         $this->assertEquals(200, $response->getStatusCode());
     }
