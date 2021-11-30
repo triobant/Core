@@ -68,4 +68,21 @@
         $this->assertEmpty($authAdminUser);
         $this->assertEquals(200, $response->getStatusCode());
      }
+
+     public function testUserIsNotAuthenticated()
+     {
+         $username = 'testuser01';
+         $middleware = $this->getMiddleware();
+         $this->registry->method('isAuthenticated')->willReturn(false);
+         $this->registry->method('getAuth')->willReturn($username);
+         $this->registry->method('isAdmin')->willReturn(true);
+         $request = $this->requestFactory->createServerRequest('GET', '/test');
+         $response = $middleware->process($request, $this->handler);
+
+         $authAdminUser = $this->recentlyHandledRequest->getAttribute('HORDE_GLOBAL_ADMIN');
+         // assert that $authAdminUser has the correct Value
+
+         $this->assertEmpty($authAdminUser);
+         $this->assertEquals(200, $response->getStatusCode());
+     }
  }
