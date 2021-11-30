@@ -33,18 +33,18 @@
      {
         $username = 'testuser01';
         $middleware = $this->getMiddleware();
-        //$this->registry->method('isAuthenticated')->willReturn(true);
-        $this->registry->method('isAdmin')->willReturn(true); // will set true
+        $this->registry->method('isAuthenticated')->willReturn(true);
         $this->registry->method('getAuth')->willReturn($username);
+        $this->registry->method('isAdmin')->willReturn(true); // will set true
         $request = $this->requestFactory->createServerRequest('GET', '/test');
         $response = $middleware->process($request, $this->handler);
 
-        //$authUser = $this->recentlyHandledRequest->getAttribute('HORDE_AUTHENTICATED_USER');
+        //$authUser = $this->recentlyHandledRequest->getAttribute('HORDE_AUTHENTICATED_USER'); // warum null? 
         //$guestUser = $this->recentlyHandledRequest->getAttribute('HORDE_GUEST');
         $authAdminUser = $this->recentlyHandledRequest->getAttribute('HORDE_GLOBAL_ADMIN');
         // assert that $authAdminUser has the correct Value
 
-        $this->assertEquals($username, $authAdminUser);
+        $this->assertTrue($authAdminUser); // tests if $authAdminUser is set to true -> Admin
         //$this->assertNull($guestUser);
 
         $this->assertEquals(200, $response->getStatusCode());
@@ -54,9 +54,9 @@
      {
         $username = 'testuser01';
         $middleware = $this->getMiddleware();
-        //$this->registry->method('isAuthenticated')->willReturn(true);
-        $this->registry->method('isAdmin')->willReturn(false); //will set false
+        $this->registry->method('isAuthenticated')->willReturn(true);
         $this->registry->method('getAuth')->willReturn($username);
+        $this->registry->method('isAdmin')->willReturn(false); //will set false
         $request = $this->requestFactory->createServerRequest('GET', '/test');
         $response = $middleware->process($request, $this->handler);
 
@@ -65,6 +65,7 @@
         $authAdminUser = $this->recentlyHandledRequest->getAttribute('HORDE_GLOBAL_ADMIN');
         // assert that $authAdminUser has the correct Value
 
+        $this->assertEmpty($authAdminUser);
         $this->assertEquals(200, $response->getStatusCode());
      }
  }
