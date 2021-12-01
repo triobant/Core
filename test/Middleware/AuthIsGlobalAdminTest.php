@@ -39,14 +39,10 @@
         $request = $this->requestFactory->createServerRequest('GET', '/test');
         $response = $middleware->process($request, $this->handler);
 
-        //$authUser = $this->recentlyHandledRequest->getAttribute('HORDE_AUTHENTICATED_USER'); // warum null? 
-        //$guestUser = $this->recentlyHandledRequest->getAttribute('HORDE_GUEST');
         $authAdminUser = $this->recentlyHandledRequest->getAttribute('HORDE_GLOBAL_ADMIN');
         // assert that $authAdminUser has the correct Value
 
         $this->assertTrue($authAdminUser); // tests if $authAdminUser is set to true -> Admin
-        //$this->assertNull($guestUser);
-
         $this->assertEquals(200, $response->getStatusCode());
      }
 
@@ -60,12 +56,10 @@
         $request = $this->requestFactory->createServerRequest('GET', '/test');
         $response = $middleware->process($request, $this->handler);
 
-        //$authUser = $this->recentlyHandledRequest->getAttribute('HORDE_AUTHENTICATED_USER');
-        //$guestUser = $this->recentlyHandledRequest->getAttribute('HORDE_GUEST');
         $authAdminUser = $this->recentlyHandledRequest->getAttribute('HORDE_GLOBAL_ADMIN');
         // assert that $authAdminUser has the correct Value
 
-        $this->assertEmpty($authAdminUser);
+        $this->assertNull($authAdminUser); // asserTrue/False before, resulted in failing to assert that null is false 
         $this->assertEquals(200, $response->getStatusCode());
      }
 
@@ -82,7 +76,7 @@
          $authAdminUser = $this->recentlyHandledRequest->getAttribute('HORDE_GLOBAL_ADMIN');
          // assert that $authAdminUser has the correct Value
 
-         $this->assertEmpty($authAdminUser);
+         $this->assertNull($authAdminUser);
          $this->assertEquals(200, $response->getStatusCode());
      }
  }
