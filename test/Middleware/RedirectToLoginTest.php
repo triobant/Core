@@ -31,13 +31,36 @@ class RedirectToLoginTest extends TestCase
             $this->responseFactory);
     }
 
-    public function IsRedirectedToLogin()
+    public function testIsRedirectedToLogin()
     {
+        //$username = 'testuser01';
+        $middleware = $this->getMiddleware();
+        $this->registry->method('isAuthenticated')->willReturn(false);
+        //$this->registry->method('getAuth')->willReturn($username);
+        $request = $this->requestFactory->createServerRequest('GET', '/test');
+        $response = $middleware->process($request, $this->handler);
+        //$authUser = $this->recentlyHandledRequest->getAttribute('HORDE_AUTHENTICATED_USER');
+        $this->recentlyHandledRequest->getAttribute('HORDE_AUTHENTICATED_USER');
+        $redirect = $this->registry->getInitialPage('horde');
+        //var_dump($redirect);
+        //$this->redirect->method('Location')->willReturn($authUser);
 
+
+        //$this->assertEquals($redirect, $authUser);
+        $this->assertEquals(302, $response->getStatusCode());
     }
 
-    public function IsNotRedirectedToLogin()
+    /*public function testIsNotRedirectedToLogin()
     {
+        $username = 'testuser01';
+        $middleware = $this->getMiddleware();
+        $this->registry->method('isAuthenticated')->willReturn(true);
+        $this->registry->method('getAuth')->willReturn($username);
+        $request = $this->requestFactory->createServerRequest('GET', '/test');
+        $response = $middleware->process($request, $this->handler);
+        $authUser = $this->recentlyHandledRequest->getAttribute('HORDE_AUTHENTICATED_USER');
 
-    }
+        $this->assertEquals($username, $authUser);
+        $this->assertEquals(302, $response->getStatusCode());
+    }*/
 }
