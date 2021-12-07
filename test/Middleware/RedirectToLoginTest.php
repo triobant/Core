@@ -16,6 +16,7 @@ use Horde\Core\Middleware\RedirectToLogin;
 
 use Horde\Test\TestCase;
 
+use Horde;
 use Horde_Session;
 use Horde_Exception;
 use Horde_Registry;
@@ -33,34 +34,26 @@ class RedirectToLoginTest extends TestCase
 
     public function testIsRedirectedToLogin()
     {
-        //$username = 'testuser01';
         $middleware = $this->getMiddleware();
-        $this->registry->method('isAuthenticated')->willReturn(false);
-        //$this->registry->method('getAuth')->willReturn($username);
         $request = $this->requestFactory->createServerRequest('GET', '/test');
         $response = $middleware->process($request, $this->handler);
-        //$authUser = $this->recentlyHandledRequest->getAttribute('HORDE_AUTHENTICATED_USER');
-        $this->recentlyHandledRequest->getAttribute('HORDE_AUTHENTICATED_USER');
-        $redirect = $this->registry->getInitialPage('horde');
+        $redirect = (string)Horde::Url($this->registry->getInitialPage('horde'), true);
+        $this->responseFactory->createResponse(302)->withHeader('Location', $redirect);
+        //teste ob der header 'location' da ist und ob er den gleichen Wert hat wie $redirect
         //var_dump($redirect);
         //$this->redirect->method('Location')->willReturn($authUser);
+        
 
-
-        //$this->assertEquals($redirect, $authUser);
         $this->assertEquals(302, $response->getStatusCode());
     }
 
-    /*public function testIsNotRedirectedToLogin()
+    public function testIsNotRedirectedToLogin()
     {
-        $username = 'testuser01';
         $middleware = $this->getMiddleware();
-        $this->registry->method('isAuthenticated')->willReturn(true);
-        $this->registry->method('getAuth')->willReturn($username);
         $request = $this->requestFactory->createServerRequest('GET', '/test');
         $response = $middleware->process($request, $this->handler);
-        $authUser = $this->recentlyHandledRequest->getAttribute('HORDE_AUTHENTICATED_USER');
+        //teste ob response code 200 ist
 
-        $this->assertEquals($username, $authUser);
-        $this->assertEquals(302, $response->getStatusCode());
-    }*/
+        $this->assertEquals(200, $response->getStatusCode());
+    }
 }
