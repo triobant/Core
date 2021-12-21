@@ -32,7 +32,7 @@ class RedirectToLoginTest extends TestCase
             $this->responseFactory);
     }
 
-    public function testIsRedirectedToLogin()
+    /*public function testIsRedirectedToLogin()
     {
         $middleware = $this->getMiddleware();
         $request = $this->requestFactory->createServerRequest('GET', '/test');
@@ -42,15 +42,16 @@ class RedirectToLoginTest extends TestCase
         //teste ob der header 'location' da ist und ob er den gleichen Wert hat wie $redirect
         //var_dump($redirect);
         //$this->redirect->method('Location')->willReturn($authUser);
-        
 
+        $this->assertEquals('Location', $redirect);
         $this->assertEquals(302, $response->getStatusCode());
-    }
+    }*/
 
     public function testIsNotRedirectedToLogin()
     {
         $middleware = $this->getMiddleware();
         $request = $this->requestFactory->createServerRequest('GET', '/test');
+        $request = $request->withAttribute('HORDE_AUTHENTICATED_USER', true);
         $response = $middleware->process($request, $this->handler);
         //teste ob response code 200 ist
 
