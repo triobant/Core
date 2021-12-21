@@ -14,8 +14,9 @@
 namespace Horde\Core\Test\Middleware;
 
 use Horde\Core\Middleware\RedirectToLogin;
-
+use Horde\Core\UrlStore;
 use Horde\Test\TestCase;
+use Horde_Url;
 
 class RedirectToLoginTest extends TestCase
 {
@@ -23,27 +24,27 @@ class RedirectToLoginTest extends TestCase
 
     protected function getMiddleware()
     {
+        $this->urlStore = $this->createMock(UrlStore::class);
         return new RedirectToLogin(
             $this->registry,
-            $this->responseFactory
+            $this->responseFactory,
+            $this->urlStore
         );
     }
 
-    // not used currently because of problems with Horde::Url call of GLOBALS['registry']
-    /*public function testIsRedirectedToLogin()
+    public function testIsRedirectedToLogin()
     {
         $middleware = $this->getMiddleware();
         $request = $this->requestFactory->createServerRequest('GET', '/test');
+
+        $url = new Horde_Url('/testpath');
+        $this->urlStore->method('getInitialPage')->willReturn($url);
         $response = $middleware->process($request, $this->handler);
-        $redirect = (string)Horde::Url($this->registry->getInitialPage('horde'), true);
-        $this->responseFactory->createResponse(302)->withHeader('Location', $redirect);
 
-        //var_dump($redirect);
-        //$this->redirect->method('Location')->willReturn($authUser);
-
-        $this->assertEquals('Location', $redirect);
+        $locationHeader = $response->getHeaderLine('Location');
+        $this->assertEquals($locationHeader, (string) $url);
         $this->assertEquals(302, $response->getStatusCode());
-    }*/
+    }
 
     public function testIsNotRedirectedToLogin()
     {
