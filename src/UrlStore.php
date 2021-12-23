@@ -10,7 +10,8 @@ use Horde_Registry;
 
 class UrlStore
 {
-    public function __construct(Horde_Registry $registry) //added the dependency accordingly
+    protected Horde_Registry $registry;
+    public function __construct(Horde_Registry $registry)
     {
         $this->registry = $registry;
     }
