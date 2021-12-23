@@ -37,7 +37,7 @@ class RedirectToLoginTest extends TestCase
         $middleware = $this->getMiddleware();
         $request = $this->requestFactory->createServerRequest('GET', '/test');
 
-        $url = new Horde_Url(''); // deleted '/tespath' so that the test is working
+        $url = new Horde_Url('/testpath'); //added '/testpath' again; it is now working with a string data type
         $this->urlStore->method('getInitialPage')->willReturn($url);
         $response = $middleware->process($request, $this->handler);
 

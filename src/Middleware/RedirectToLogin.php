@@ -30,14 +30,14 @@ use Psr\Http\Message\ResponseFactoryInterface;
  */
 class RedirectToLogin implements MiddlewareInterface
 {
-    public UrlStore $UrlStore; //added this
+    protected UrlStore $urlStore; //changed it from public to protected;
     private Horde_Registry $registry;
     private ResponseFactoryInterface $responseFactory;
-    public function __construct(Horde_Registry $registry, ResponseFactoryInterface $responseFactory)
+    public function __construct(Horde_Registry $registry, ResponseFactoryInterface $responseFactory, UrlStore $urlStore)
     {
         $this->registry = $registry;
         $this->responseFactory = $responseFactory;
-        //$this->UrlStore; //added this; is it necessary?
+        $this->urlStore = $urlStore; //
     }
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
@@ -45,7 +45,7 @@ class RedirectToLogin implements MiddlewareInterface
             return $handler->handle($request);
         }
         
-        $redirect = (string)$this->registry->getInitialPage(); //changed this; before it was $this->UrlStore->getInitialPage();
+        $redirect = (string)$this->urlStore->getInitialPage('horde', true); //corrected this; added attributes
         return $this->responseFactory->createResponse(302)->withHeader('Location', $redirect);
     }
 }
