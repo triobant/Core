@@ -18,6 +18,7 @@ use Horde\Test\TestCase;
 
 use Horde;
 use Horde_Registry;
+use Horde_Exception;
 
 class AppFinderTest extends TestCase
 {
@@ -25,20 +26,37 @@ class AppFinderTest extends TestCase
 
     protected function getMiddleware()
     {
+        $this->registry = $this->createMock(Horde_Registry::class);
         return new AppFinder(
-            $this->registry,
-            $this->handler);
+            $this->registry
+        );
     }
+    /**
+     * This tests if the Appfinder throws an exception if no app was found in path
+     */
+    public function testNoValidAppInPath()
+    {
+        $appname = 'foobar';
+        $app = new Horde_Registry($this->registry->method('listApps')->willReturn($appname));
+        // $urlone = 'https://example.ex/foobar/lws';
+        $urltwo = 'https://bla.xy/foobar/qwe';
+        $middleware = $this->getMiddleware();
+        $request = $this->requestFactory->createServerRequest('GET', '/test');
+        $response = $middleware->process($request, $this->handler);
 
-    public function testNoAppFound()
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals($urltwo, 'No App found for this path');
+    }
+    /**
+     * This tests 
+     */
+   /* public function testAppFound() 
     {
         $middleware = $this->getMiddleware();
-     
-        $this->assertEmpty($found);
-    }
+        $request = $this->requestFactory->createServerRequest('GET', '/test');
+        $response = $middleware->process($request, $this->handler);
 
-    public function testAppFound() 
-    {
-        $middleware = $this->getMiddleware();
-    }
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals();
+    }*/
 }
