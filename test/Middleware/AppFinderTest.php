@@ -34,19 +34,37 @@ class AppFinderTest extends TestCase
     /**
      * This tests if the Appfinder throws an exception if no app was found in path
      */
-    public function testNoValidAppInPath()
+
+    public function testTest() /* This is just there for trial and error and to find a possible solution*/
     {
-        $appname = 'foobar';
-        $app = new Horde_Registry($this->registry->method('listApps')->willReturn($appname));
-        // $urlone = 'https://example.ex/foobar/lws';
-        $urltwo = 'https://bla.xy/foobar/qwe';
+        $app = 'https://example.ex/foobar/lws';
+        $appname = $this->registry->method('listApps')->willReturn('foobar');
+        $id = $this->createMock(Horde_Registry::class);
+        $found = $this->registry->method('identifyApp')->willReturn($id, $appname);
+        $this->registry->method('get')->willReturn('webroot', $app);
         $middleware = $this->getMiddleware();
         $request = $this->requestFactory->createServerRequest('GET', '/test');
         $response = $middleware->process($request, $this->handler);
 
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals($urltwo, 'No App found for this path');
+        $this->assertEquals($found, $app);
     }
+    
+    /*public function testNoValidAppInPath()
+    {
+        $appname = 'foobar'; // variable with the name of the app
+        $app = new Horde_Registry($this->registry->method('listApps')->willReturn($appname)); // Trying to mock the method that will return the name of the app in the lists
+        // $urlone = 'https://example.ex/foobar/lws';
+        $urltwo = 'https://bla.xy/foobar/qwe'; // Mock for an example url
+        $middleware = $this->getMiddleware();
+        $request = $this->requestFactory->createServerRequest('GET', '/test');
+        $response = $middleware->process($request, $this->handler);
+        $notfound = $this->registry->method('identifyApp')->willReturn($urltwo, $app); // I want to see if $appname was found within the url
+        $message = new \Exception('No App found for this path'); // Need to set the exception message if app wasn't found
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals($notfound, $message);
+    }*/
     /**
      * This tests 
      */
