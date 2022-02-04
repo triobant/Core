@@ -14,11 +14,15 @@ namespace Horde\Core\Test\Middleware;
 
 use Horde\Core\Middleware\AppFinder;
 
+use Psr\Http\Message\ServerRequestInterface; // added this for research purpose
+
 use Horde\Test\TestCase;
 
 use Horde;
+use Horde\Http\Test\ServerRequestTest;
 use Horde_Registry;
 use Horde_Exception;
+use TypeError;
 
 class AppFinderTest extends TestCase
 {
@@ -26,7 +30,6 @@ class AppFinderTest extends TestCase
 
     protected function getMiddleware()
     {
-        $this->registry = $this->createMock(Horde_Registry::class);
         return new AppFinder(
             $this->registry
         );
@@ -35,46 +38,35 @@ class AppFinderTest extends TestCase
      * This tests if the Appfinder throws an exception if no app was found in path
      */
 
-    public function testTest() /* This is just there for trial and error and to find a possible solution*/
+    public function testAppFound() /* This is just there for trial and error and to find a possible solution*/
     {
-        $app = 'https://example.ex/foobar/lws';
-        $appname = $this->registry->method('listApps')->willReturn('foobar');
-        $id = $this->createMock(Horde_Registry::class);
-        $found = $this->registry->method('identifyApp')->willReturn($id, $appname);
-        $this->registry->method('get')->willReturn('webroot', $app);
-        $middleware = $this->getMiddleware();
-        $request = $this->requestFactory->createServerRequest('GET', '/test');
-        $response = $middleware->process($request, $this->handler);
+        // mock Horde_Registry, Horde_Registry::listApps, Horde_Registry::get
 
+        
+        $url = 'https://example.ex/foobar';
+        $registry = $this->createMock(Horde_Registry::class);
+        $request = $this->requestFactory->createServerRequest('GET', $url); // /'test' was changed to $url
+        $request = $request->withAttribute('registry', $registry);
+
+        
+        $registry->method('listApps')->willReturn(['foobar']);
+        $registry->method('get')->willReturn($url);
+        
+        
+        $middleware = $this->getMiddleware();
+        $response = $middleware->process($request, $this->handler);
+        
+        $found = $this->recentlyHandledRequest->getAttribute('app');
+        
+        $this->assertSame('foobar', $found);
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals($found, $app);
     }
     
     /*public function testNoValidAppInPath()
-    {
-        $appname = 'foobar'; // variable with the name of the app
-        $app = new Horde_Registry($this->registry->method('listApps')->willReturn($appname)); // Trying to mock the method that will return the name of the app in the lists
-        // $urlone = 'https://example.ex/foobar/lws';
-        $urltwo = 'https://bla.xy/foobar/qwe'; // Mock for an example url
-        $middleware = $this->getMiddleware();
-        $request = $this->requestFactory->createServerRequest('GET', '/test');
-        $response = $middleware->process($request, $this->handler);
-        $notfound = $this->registry->method('identifyApp')->willReturn($urltwo, $app); // I want to see if $appname was found within the url
-        $message = new \Exception('No App found for this path'); // Need to set the exception message if app wasn't found
-
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals($notfound, $message);
+    {  
+     
     }*/
     /**
      * This tests 
      */
-   /* public function testAppFound() 
-    {
-        $middleware = $this->getMiddleware();
-        $request = $this->requestFactory->createServerRequest('GET', '/test');
-        $response = $middleware->process($request, $this->handler);
-
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals();
-    }*/
 }
