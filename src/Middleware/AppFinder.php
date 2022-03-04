@@ -66,7 +66,7 @@ class AppFinder implements MiddlewareInterface
         }
         return '/' . implode('/', $partsOut);
     }
-
+    
     /**
      * Identify the correct app to handle the request
      *
@@ -89,14 +89,14 @@ class AppFinder implements MiddlewareInterface
             $scheme = $request->getUri()->getScheme();
             $host = $request->getUri()->getHost();
             $path = $request->getUri()->getPath();
-
+            
             $default = [
-               'scheme' => $scheme,
-               'host' => $host,
-               'path' => '',
-               'app' => $app,
+                'scheme' => $scheme,
+                'host' => $host,
+                'path' => '',
+                'app' => $app,
             ];
-
+            
             $applicationUrl = array_merge($default, parse_url($registry->get('webroot', $app)));
             $applicationUrl['path'] = $this->_normalize($applicationUrl['path']);
             // sort out cases with wrong host or scheme
@@ -107,7 +107,7 @@ class AppFinder implements MiddlewareInterface
                 continue;
             }
             // does the path match at all?
-
+            
             if (substr($path, 0, strlen($applicationUrl['path'])) == $applicationUrl['path']) {
                 $matches[] = $applicationUrl;
             }
@@ -125,8 +125,8 @@ class AppFinder implements MiddlewareInterface
         );
         return array_pop($matches);
     }
-
-
+    
+    
     /**
      * Configure the
      *
@@ -147,18 +147,17 @@ class AppFinder implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $requestServer = $request->getUri()->getHost();
-
+        
         $uriScheme = $request->getUri()->getScheme();
         $registry = $request->getAttribute('registry');
-
+        
         $found = $this->identifyApp($request, $registry);
-        $prefix = $found['path'];
-
         // If we still found no app, give up
         if (empty($found)) {
-            throw new \Exception("No App found for this path");
-        }
-
+              throw new \Exception("No App found for this path");
+            }
+        
+        $prefix = $found['path'];
         // Route mapper doesn't like / as prefix
         if ($prefix == '/') {
             $prefix = '';
