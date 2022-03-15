@@ -93,7 +93,7 @@ class AppFinderTest extends TestCase
     {
         $baseUrl = 'https://example.ex/';
         $app = 'foobar';
-        $list = ['foo', 'foobar'];
+        $list = ['foobar', 'foo'];
         $requestUrl = $baseUrl . $app;
         $registry = $this->createMock(Horde_Registry::class);
         $request = $this->requestFactory->createServerRequest('GET', $requestUrl);

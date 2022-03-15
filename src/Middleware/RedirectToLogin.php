@@ -15,7 +15,6 @@ use Horde_Controller;
 use Horde_Routes_Mapper as Router;
 use Horde_String;
 use Horde;
-use Horde\Core\UrlStore;
 use Horde\Core\UserPassport;
 use Psr\Http\Message\ResponseFactoryInterface;
 
@@ -30,20 +29,19 @@ use Psr\Http\Message\ResponseFactoryInterface;
  */
 class RedirectToLogin implements MiddlewareInterface
 {
-    protected UrlStore $urlStore;
+    private Horde_Registry $registry;
     private ResponseFactoryInterface $responseFactory;
-    public function __construct(ResponseFactoryInterface $responseFactory, UrlStore $urlStore)
+    public function __construct(Horde_Registry $registry, ResponseFactoryInterface $responseFactory)
     {
+        $this->registry = $registry;
         $this->responseFactory = $responseFactory;
-        $this->urlStore = $urlStore;
     }
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         if ($request->getAttribute('HORDE_AUTHENTICATED_USER')) {
             return $handler->handle($request);
         }
-        
-        $redirect = (string)$this->urlStore->getInitialPage('horde', true);
+        $redirect = (string)Horde::Url($this->registry->getInitialPage('horde'), true);
         return $this->responseFactory->createResponse(302)->withHeader('Location', $redirect);
     }
 }
