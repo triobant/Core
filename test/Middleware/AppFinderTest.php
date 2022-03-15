@@ -36,7 +36,7 @@ class AppFinderTest extends TestCase
         );
     }
     /**
-     * This tests if the Appfinder finds a valid app in path
+     * This tests if the AppFinder finds a valid app in path
      */
     public function testAppFound()
     {
@@ -61,23 +61,6 @@ class AppFinderTest extends TestCase
         $foundApp = $this->recentlyHandledRequest->getAttribute('app');
 
         $this->assertSame($app, $foundApp);
-        /*$url = 'https://example.ex/foobar';
-        $registry = $this->createMock(Horde_Registry::class);
-        $request = $this->requestFactory->createServerRequest('GET', $url); // /'test' was changed to $url
-        $request = $request->withAttribute('registry', $registry);
-
-        
-        $registry->method('listApps')->willReturn(['foobar']);
-        $registry->method('get')->willReturn($url);
-        
-        
-        $middleware = $this->getMiddleware();
-        $response = $middleware->process($request, $this->handler);
-        
-        $found = $this->recentlyHandledRequest->getAttribute('app');
-        
-        $this->assertSame('foobar', $found);
-        $this->assertEquals(200, $response->getStatusCode());*/
     }
     /**
      * This tests if the Appfinder throws an exception if no app was found in path
@@ -99,14 +82,35 @@ class AppFinderTest extends TestCase
         
         
         $middleware = $this->getMiddleware();
-        //$this->expectExceptionMessage("Yes");
-        //$this->expectExceptionMessage("No");
-        //$this->expectExceptionMessage("No App found for this path");
+        $this->expectExceptionMessage("No App found for this path");
         $this->expectException(\Exception::class);
         $response = $middleware->process($request, $this->handler);
     }
     /**
      * This tests if the longest match path is the right app
      */
+    public function testLongestMatchPath() 
+    {
+        $baseUrl = 'https://example.ex/';
+        $app = 'foobar';
+        $list = ['foo', 'foobar'];
+        $requestUrl = $baseUrl . $app;
+        $registry = $this->createMock(Horde_Registry::class);
+        $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
+        $request = $request->withAttribute('registry', $registry);
 
+
+        $registry->method('listApps')->willReturn($list);
+        $registry->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
+            return $baseUrl . $app;
+        });
+
+        
+        $middleware = $this->getMiddleware();
+        $response = $middleware->process($request, $this->handler);
+
+        $foundApp = $this->recentlyHandledRequest->getAttribute('app');
+
+        $this->assertSame($app, $foundApp);
+    }
 }
