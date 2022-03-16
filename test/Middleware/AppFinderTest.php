@@ -94,6 +94,59 @@ class AppFinderTest extends TestCase
         $baseUrl = 'https://example.ex/';
         $app = 'foobar';
         $list = ['foobar', 'foo'];
+        $rlist = ['foo', 'foobar'];
+        $requestUrl = $baseUrl . $app;
+        $registry = $this->createMock(Horde_Registry::class);
+        $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
+        $request = $request->withAttribute('registry', $registry);
+
+
+        $registry->method('listApps')->willReturn($rlist);
+        $registry->method('listApps')->willReturn($list);  
+        $registry->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
+            return $baseUrl . $app;
+        });
+
+        
+        $middleware = $this->getMiddleware();
+        $response = $middleware->process($request, $this->handler);
+
+        $foundApp = $this->recentlyHandledRequest->getAttribute('app');
+
+        $this->assertSame($app, $foundApp);
+    }
+    /** 
+     * This tests the case when there are NO available apps 
+    */
+    public function testNoAppAvailable() 
+    {
+        $baseUrl = 'https://example.ex/';
+        $app = 'amount';
+        $list = [];
+        $requestUrl = $baseUrl . $app;
+        $registry = $this->createMock(Horde_Registry::class);
+        $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
+        $request = $request->withAttribute('registry', $registry);
+        
+        $registry->method('listApps')->willReturn($list);
+        $registry->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
+            return $baseUrl . $app;
+        });
+        
+        
+        $middleware = $this->getMiddleware();
+        $this->expectExceptionMessage("No App found for this path");
+        $this->expectException(\Exception::class);
+        $response = $middleware->process($request, $this->handler);
+    }
+    /**
+     * This tests if the routerprefix attribute is set properly
+     */
+    public function testRouterPrefixAttribute()
+    {
+        $baseUrl = 'https://example.ex/';
+        $app = 'barfoo';
+        $list = ['foobar', 'bla', 'foo', 'barfoo', 'bar'];
         $requestUrl = $baseUrl . $app;
         $registry = $this->createMock(Horde_Registry::class);
         $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
@@ -109,8 +162,42 @@ class AppFinderTest extends TestCase
         $middleware = $this->getMiddleware();
         $response = $middleware->process($request, $this->handler);
 
-        $foundApp = $this->recentlyHandledRequest->getAttribute('app');
+        $routerPrefix = $this->recentlyHandledRequest->getAttribute('routerPrefix');
+        
+        $this->assertSame('/bar', $routerPrefix);
+    }
+    /**
+     * This tests if the path gets normalized when it contains any . and .. levels
+     */
+    public function testNormalizePath() // change code accordingly so it returns the right and normalized path
+    {
+        $baseUrl = 'https://example.ex/./../';
+        $app = 'bla';
+        $list = ['foobar', 'bla', 'foo', 'barfoo', 'bar'];
+        $requestUrl = $baseUrl . $app;
+        $registry = $this->createMock(Horde_Registry::class);
+        $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
+        $request = $request->withAttribute('registry', $registry);
 
-        $this->assertSame($app, $foundApp);
+
+        $registry->method('listApps')->willReturn($list);
+        $normalizePath = $registry->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
+            return $baseUrl . $app;
+        });
+        
+        
+        $middleware = $this->getMiddleware();
+        $response = $middleware->process($request, $this->handler);
+
+        $normalizePath = $this->recentlyHandledRequest->getAttribute('app');
+        
+        $this->assertSame($app, $normalizePath);
+    }
+    /**
+     * This tests if the AppFinder will return the exception when the scheme or host are different
+     */
+    public function testSchemeHostDiff()
+    {
+        
     }
 }
