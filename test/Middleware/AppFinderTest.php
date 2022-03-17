@@ -38,7 +38,7 @@ class AppFinderTest extends TestCase
     /**
      * This tests if the AppFinder finds a valid app in path
      */
-    public function testAppFound()
+    public function TestAppFound()
     {
         $baseUrl = 'https://example.ex/';
         $app = 'bar';
@@ -65,7 +65,7 @@ class AppFinderTest extends TestCase
     /**
      * This tests if the Appfinder throws an exception if no app was found in path
      */
-    public function testNoValidAppInPath()
+    public function TestNoValidAppInPath()
     {
         $baseUrl = 'https://example.ex/';
         $app = 'amount';
@@ -89,7 +89,7 @@ class AppFinderTest extends TestCase
     /**
      * This tests if the longest match path is the right app
      */
-    public function testLongestMatchPath() 
+    public function TestLongestMatchPath() 
     {
         $baseUrl = 'https://example.ex/';
         $app = 'foobar';
@@ -111,14 +111,16 @@ class AppFinderTest extends TestCase
         $middleware = $this->getMiddleware();
         $response = $middleware->process($request, $this->handler);
 
-        $foundApp = $this->recentlyHandledRequest->getAttribute('app');
+        $longestMatch = $this->recentlyHandledRequest->getAttribute('app');
 
-        $this->assertSame($app, $foundApp);
+        $this->assertSame($app, $longestMatch);
     }
     /** 
-     * This tests the case when there are NO available apps 
+     * This tests the case when there are NO available apps
+     * 
+     * Like the case of testNoAppFound() it will throw out the exception
     */
-    public function testNoAppAvailable() 
+    public function TestNoAppAvailable() 
     {
         $baseUrl = 'https://example.ex/';
         $app = 'amount';
@@ -142,7 +144,7 @@ class AppFinderTest extends TestCase
     /**
      * This tests if the routerprefix attribute is set properly
      */
-    public function testRouterPrefixAttribute()
+    public function TestRouterPrefixAttribute()
     {
         $baseUrl = 'https://example.ex/';
         $app = 'barfoo';
@@ -164,14 +166,14 @@ class AppFinderTest extends TestCase
 
         $routerPrefix = $this->recentlyHandledRequest->getAttribute('routerPrefix');
         
-        $this->assertSame('/bar', $routerPrefix);
+        $this->assertSame('/barfoo', $routerPrefix);
     }
     /**
      * This tests if the path gets normalized when it contains any . and .. levels
      */
     public function testNormalizePath() // change code accordingly so it returns the right and normalized path
     {
-        $baseUrl = 'https://example.ex/./../';
+        $baseUrl = 'https://example.ex/../';
         $app = 'bla';
         $list = ['foobar', 'bla', 'foo', 'barfoo', 'bar'];
         $requestUrl = $baseUrl . $app;
@@ -196,8 +198,35 @@ class AppFinderTest extends TestCase
     /**
      * This tests if the AppFinder will return the exception when the scheme or host are different
      */
-    public function testSchemeHostDiff()
+    public function TestSchemeHostDiff() // change code accordingly so that the request scheme returned is different
     {
+        $baseUrl = 'https://example.ex/';
+        $app = 'bar';
+        $list = ['foobar', 'bla', 'foo', 'barfoo', 'bar'];
+        $requestUrl = $baseUrl . $app;
+        $registry = $this->createMock(Horde_Registry::class);
+        $request = $this->requestFactory->createServerRequest('GET', $requestUrl);
+        $request = $request->withAttribute('registry', $registry);
+
+
+        $registry->method('listApps')->willReturn($list);
+        $registry->method('get')->willReturnCallback(function ($type, $app) use ($baseUrl) {
+            return $baseUrl . $app;
+        });
+
         
+        $middleware = $this->getMiddleware();
+        $response = $middleware->process($request, $this->handler);
+
+        $schemeDiff = $this->recentlyHandledRequest->getAttribute('app');
+
+        $this->assertSame($app, $schemeDiff);
+    }
+    /**
+     * This tests the case when the path is empty
+     */
+    public function TestEmptyPath()
+    {
+       
     }
 }
